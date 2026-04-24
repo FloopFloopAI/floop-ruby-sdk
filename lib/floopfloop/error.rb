@@ -30,14 +30,28 @@ module FloopFloop
       @status      = status
       @request_id  = request_id
       @retry_after = retry_after
+      # Stash the raw message in our own ivar. Ruby's Exception#message
+      # and Exception#to_s call each other by default, so if we override
+      # #to_s and call #message from inside it we hit infinite recursion
+      # on Ruby 3.1+. Reading @raw_message directly avoids the loop.
+      @raw_message = message
       super(message)
+    end
+
+    # #message returns the raw server-side message so `err.message`
+    # is the string the backend sent.  #to_s returns the prettified
+    # "floop: [CODE STATUS] message (request X)" form useful for
+    # logging.  By default Ruby's Exception has both delegate to each
+    # other, but splitting them cleanly lets callers choose.
+    def message
+      @raw_message
     end
 
     def to_s
       parts = +"floop: ["
-      parts << code
+      parts << code.to_s
       parts << " #{status}" unless status.nil? || status.zero?
-      parts << "] #{message}"
+      parts << "] #{@raw_message}"
       parts << " (request #{request_id})" if request_id
       parts
     end
