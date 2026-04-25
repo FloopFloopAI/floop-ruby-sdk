@@ -92,6 +92,8 @@ Known codes: `UNAUTHORIZED`, `FORBIDDEN`, `VALIDATION_ERROR`, `RATE_LIMITED`, `N
 
 Method-for-method parity with `@floopfloop/sdk` (Node), `floopfloop` (Python), `floopfloop` (Rust), and `floop-go-sdk` (Go).
 
+For longer end-to-end patterns — streaming a build, refining mid-deploy, attachment uploads, key rotation, retry-with-backoff — see the [cookbook](docs/recipes.md).
+
 ## Uploading attachments
 
 ```ruby
