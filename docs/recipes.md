@@ -256,6 +256,25 @@ projects = with_retry { client.projects.list }
 
 ---
 
+## 7. Make a small change without a full rebuild (`code_edit_only`)
+
+Default `refine` runs the full 6-step pipeline — replan, regenerate, redeploy. For a copy edit, a colour swap, or a typo fix that doesn't need a redesign, pass `code_edit_only: true`. The backend cuts to a 3-step in-place patch and deducts the cheaper code-edit credit cost (roughly half a refinement).
+
+Only meaningful once the project has reached `live` at least once — on a project that hasn't deployed yet, the flag is ignored and you get a normal initial build.
+
+```ruby
+client.projects.refine(
+  "recipe-blog",
+  message: "Change the hero headline from 'Welcome' to 'Hello there.'",
+  code_edit_only: true,
+)
+client.projects.wait_for_live("recipe-blog")
+```
+
+If the change actually needs a redesign or a new dependency, prefer a plain `refine` — `code_edit_only` is for surface-level edits only. The backend won't promote a code-edit into a full refinement automatically; it just runs the 3-step patch with the limited tools it has, and you may end up paying for a second `refine` to redo the change properly.
+
+---
+
 ## Got a pattern worth adding?
 
 Open an issue at [FloopFloopAI/floop-ruby-sdk/issues](https://github.com/FloopFloopAI/floop-ruby-sdk/issues) describing the use case. Recipes live in this file, not in `lib/`, so they're easy to update without a gem release.
