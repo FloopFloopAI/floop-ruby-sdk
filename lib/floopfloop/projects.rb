@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FloopFloop
-  TERMINAL_PROJECT_STATUSES = %w[live failed cancelled].freeze
+  TERMINAL_PROJECT_STATUSES = %w[live failed cancelled archived].freeze
 
   class Projects
     def initialize(client)
@@ -108,7 +108,10 @@ module FloopFloop
         last_event = event
 
         case event["status"]
-        when "live"
+        when "live", "archived"
+          # Both are terminal-success states. Archived projects are the
+          # post-active form (still hydrated, just not running) — matches
+          # the Node, Python, Swift, and Kotlin SDKs' handling.
           return event
         when "failed"
           raise FloopFloop::Error.new(

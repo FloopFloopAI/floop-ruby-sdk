@@ -43,6 +43,18 @@ class StreamTest < Minitest::Test
     assert_equal "BUILD_CANCELLED", err.code
   end
 
+  def test_archived_terminates_cleanly_like_live
+    # Pre-fix this would loop until max_wait timeout because the case
+    # statement only matched live/failed/cancelled — `archived` fell
+    # through and the poll continued. Node / Python / Swift / Kotlin
+    # treat archived as a non-error terminal; Ruby now matches.
+    stub_request(:get, "#{BASE_URL}/api/v1/projects/p_1/status")
+      .to_return(status: 200, body: '{"data":{"step":3,"totalSteps":3,"status":"archived","message":""}}')
+
+    result = make_client.projects.stream("p_1", interval: 0.01, max_wait: 5) { |_| }
+    assert_equal "archived", result["status"]
+  end
+
   def test_max_wait_exceeded_raises_timeout
     stub_request(:get, "#{BASE_URL}/api/v1/projects/p_1/status")
       .to_return(status: 200, body: '{"data":{"step":1,"totalSteps":3,"status":"queued","message":""}}')
