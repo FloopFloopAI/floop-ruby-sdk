@@ -4,6 +4,21 @@ All notable changes to `floopfloop` (Ruby SDK) are documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This gem follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with Ruby's `.alphaN` pre-release convention (e.g. `0.1.0.alpha.1`).
 
+## [0.1.0.alpha.2] — 2026-04-26
+
+### Fixed
+- **`projects.stream` and `projects.wait_for_live` looped until `max_wait`
+  timeout when a project entered the `archived` state mid-stream.** The
+  `case event["status"]` branch only matched `live` / `failed` /
+  `cancelled`; `archived` fell through and the poll continued. Now
+  `archived` is treated as a non-error terminal alongside `live`, mirroring
+  how Node, Python, Swift, and Kotlin already handle it. (Cross-SDK parity
+  fix — the `TERMINAL_PROJECT_STATUSES` constant also now includes
+  `archived`. Same drift exists in the Go, Rust, and PHP SDKs and will be
+  fixed in their next alpha bumps.)
+- `test/stream_test.rb` gains `test_archived_terminates_cleanly_like_live`
+  to lock in the regression.
+
 ## [0.1.0.alpha.1] — 2026-04-24
 
 ### Added
