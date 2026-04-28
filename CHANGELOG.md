@@ -4,6 +4,31 @@ All notable changes to `floopfloop` (Ruby SDK) are documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This gem follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with Ruby's `.alphaN` pre-release convention (e.g. `0.1.0.alpha.1`).
 
+## [0.1.0.alpha.3] — 2026-04-28
+
+### Added
+- **`client.subscriptions.current`** — new resource accessor that wraps
+  `GET /api/v1/subscriptions/current` and returns the authenticated user's
+  plan + credit-balance snapshot. Distinct from `usage.summary` —
+  `usage.summary` covers current-period consumption (credits remaining,
+  builds used, storage), while `subscriptions.current` returns the plan
+  tier itself (price, billing period, cancel state). They overlap on
+  `monthlyCredits` and `maxProjects` but serve different audiences ("am I
+  about to hit my limits?" vs "what plan am I on, and when does it
+  renew?").
+- Returns the full
+  `{"subscription" => {...} | nil, "credits" => {...} | nil}` hash. Both
+  keys are independently nullable: a user may exist without an active
+  subscription (mid-signup, cancelled with no grace credits).
+
+### Tests
+- Two new cases in `test/resources_test.rb` covering the populated-response
+  shape and the both-null edge case.
+
+### Notes
+- Mirrors [`@floopfloop/sdk` PR #6](https://github.com/FloopFloopAI/floop-node-sdk/pull/6)
+  (Node `0.1.0-alpha.3`) — cross-SDK parity drop.
+
 ## [0.1.0.alpha.2] — 2026-04-26
 
 ### Fixed

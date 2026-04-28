@@ -43,8 +43,9 @@ module FloopFloop
     def subdomains; @subdomains ||= Subdomains.new(self); end
     def secrets;    @secrets    ||= Secrets.new(self);    end
     def library;    @library    ||= Library.new(self);    end
-    def usage;      @usage      ||= Usage.new(self);      end
-    def api_keys;   @api_keys   ||= ApiKeys.new(self);    end
+    def usage;         @usage         ||= Usage.new(self);         end
+    def subscriptions; @subscriptions ||= Subscriptions.new(self); end
+    def api_keys;      @api_keys      ||= ApiKeys.new(self);       end
     def uploads;    @uploads    ||= Uploads.new(self);    end
     def user;       @user       ||= UserApi.new(self);    end
 
