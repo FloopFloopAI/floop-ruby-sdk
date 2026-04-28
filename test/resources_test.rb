@@ -73,6 +73,28 @@ class ResourcesTest < Minitest::Test
     assert_equal 12, out["currentPeriod"]["buildsUsed"]
   end
 
+  # ── subscriptions ────────────────────────────────────────────────
+
+  def test_subscriptions_current_populated
+    stub_request(:get, "#{BASE_URL}/api/v1/subscriptions/current")
+      .to_return(
+        status: 200,
+        body: '{"data":{"subscription":{"status":"active","billingPeriod":"monthly","currentPeriodStart":"2026-04-01T00:00:00Z","currentPeriodEnd":"2026-05-01T00:00:00Z","canceledAt":null,"planName":"pro","planDisplayName":"Pro","priceMonthly":29,"priceAnnual":290,"monthlyCredits":500,"maxProjects":50,"maxStorageMb":5000,"maxBandwidthMb":50000,"creditRolloverMonths":1,"features":{"teams":true}},"credits":{"current":423,"rolledOver":50,"total":473,"rolloverExpiresAt":"2026-05-01T00:00:00Z","lifetimeUsed":1234}}}',
+      )
+    out = make_client.subscriptions.current
+    assert_equal "pro", out["subscription"]["planName"]
+    assert_equal 500, out["subscription"]["monthlyCredits"]
+    assert_equal 473, out["credits"]["total"]
+  end
+
+  def test_subscriptions_current_both_null
+    stub_request(:get, "#{BASE_URL}/api/v1/subscriptions/current")
+      .to_return(status: 200, body: '{"data":{"subscription":null,"credits":null}}')
+    out = make_client.subscriptions.current
+    assert_nil out["subscription"]
+    assert_nil out["credits"]
+  end
+
   # ── api_keys ──────────────────────────────────────────────────────
 
   def test_api_keys_list_create_remove_by_name
